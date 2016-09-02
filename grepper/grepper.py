@@ -14,9 +14,10 @@ if __name__ == '__main__':
     else:
         lines = tuple(map(partial(bytes.decode, encoding='utf-8'), lines))
         selection = select_from_list(lines)
-        path, line_number, match = selection.selected.split(':', maxsplit=2)
-        args = os.environ.get('EDITOR', 'vim').split()
-        args.append('+{}'.format(line_number))
-        args.append(path)
-        args.append(os.environ)
-        os.execlpe(args[0], *args)
+        if selection.selected:
+            path, line_number, match = selection.selected.split(':', maxsplit=2)
+            args = os.environ.get('EDITOR', 'vim').split()
+            args.append('+{}'.format(line_number))
+            args.append(path)
+            args.append(os.environ)
+            os.execlpe(args[0], *args)
