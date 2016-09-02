@@ -1,6 +1,18 @@
 #!/usr/bin/env python3
 import sys
-from subprocess import check_call
+import os
+from functools import partial
+from subprocess import check_output
+
+from selector.selector import select_from_list
 
 if __name__ == '__main__':
-    check_call(['git', 'grep'] + sys.argv[1:])
+    lines = check_output(['git', 'grep', '-n'] + sys.argv[1:]).splitlines()
+    lines = tuple(map(partial(bytes.decode, encoding='utf-8'), lines))
+    selection = select_from_list(lines)
+    path, line_number, match = selection.selected.split(':', maxsplit=2)
+    args = os.environ.get('EDITOR', 'vim').split()
+    args.append('+{}'.format(line_number))
+    args.append(path)
+    args.append(os.environ)
+    os.execlpe(args[0], *args)
